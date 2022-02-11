@@ -51,7 +51,7 @@ const theme = createTheme({ //1 use case for createTheme is when you want to ove
   },
 });
 
-const AdminPage = () => {
+const Navigation = () => {
   const classes = useStyles()
   const [state, setState] = useState({
       left: false,
@@ -294,4 +294,4 @@ const toggleDrawer =
     )
 }
 
-export default AdminPage
+export default Navigation;
