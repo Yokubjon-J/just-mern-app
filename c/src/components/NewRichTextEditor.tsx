@@ -13,6 +13,7 @@ Quill.register('modules/imageResize', ImageResize);
 export default function NewRichTextEditor() {
   useEffect(() => {
     console.log("Rendering newRichTE");
+    console.log("status: ", status);
   })
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -44,10 +45,10 @@ export default function NewRichTextEditor() {
   const whenSubmit = (e:any) =>{
     e.preventDefault();
     const unprivilegedEditor = inputRef.current.makeUnprivilegedEditor(inputRef.current.getEditor());
-    if (unprivilegedEditor.getLength()) {
+    if (unprivilegedEditor.getLength() - 1 < 50) return "body length is too small"
       //console.log("viola: ", unprivilegedEditor.getLength());//will also count "\n" char
       //console.log(unprivilegedEditor.getText().length); //will also count "\n" char
-    }
+    
     setWaiting(true);
     axios.post("/post", { //You either do async/await or a Promise chain. Not both.
       title, //in server, it will be referred to as "req.body.title"
@@ -62,6 +63,10 @@ export default function NewRichTextEditor() {
       setStatus(Number(res.status));
       handleClick();
       console.log(res);
+    }).catch(e => {
+      setWaiting(false);
+      setStatus(Number(e.response.status));
+      handleClick();
     });
   }
 
@@ -115,10 +120,14 @@ export default function NewRichTextEditor() {
             <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
                 Success!
             </Alert>
-        ) : (
-            <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                Error. Please try again.
+        ) : status >= 500 ? (
+            <Alert onClose={handleClose} severity="warning" sx={{ width: '100%' }}>
+                Server error. Please try again later.
             </Alert>
+        ) : (
+          <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+              Error. Please try again.
+          </Alert>
         )}
       </Snackbar>
       </div>
