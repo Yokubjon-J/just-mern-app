@@ -27,7 +27,8 @@ export default function NewRichTextEditor() {
   const [title, setTitle] = useState('');
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(0);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  // let inputRef = useState<HTMLInputElement | null>(null);
+  let inputRef = useRef(null);
 
   const handleClick = () => {
     setOpen(true);
@@ -42,6 +43,11 @@ export default function NewRichTextEditor() {
 
   const whenSubmit = (e:any) =>{
     e.preventDefault();
+    const unprivilegedEditor = inputRef.current.makeUnprivilegedEditor(inputRef.current.getEditor());
+    if (unprivilegedEditor.getLength()) {
+      //console.log("viola: ", unprivilegedEditor.getLength());//will also count "\n" char
+      //console.log(unprivilegedEditor.getText().length); //will also count "\n" char
+    }
     setWaiting(true);
     axios.post("/post", { //You either do async/await or a Promise chain. Not both.
       title, //in server, it will be referred to as "req.body.title"
@@ -69,9 +75,9 @@ export default function NewRichTextEditor() {
         }}>
         <form onSubmit={(e) => whenSubmit(e)}>
           <input type="text" placeholder="Title"
+            minLength={7}
             value={title} 
             onChange={(e:any) => setTitle(e.target.value)}
-            ref={inputRef}
             style={{
               width: "100%",
               height:"32px",
@@ -81,6 +87,7 @@ export default function NewRichTextEditor() {
           />
           <ReactQuill theme="snow" value={value} onChange={setValue}
             placeholder="New blog"
+            ref={inputRef}
             modules={{
               toolbar: {
                   container: [
