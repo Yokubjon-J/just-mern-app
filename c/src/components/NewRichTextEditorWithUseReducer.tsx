@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useReducer, useRef, useEffect } from "react";
 import axios from 'axios';
 import LinearColor from './LinearColor';
 import ReactQuill, {Quill} from 'react-quill';
@@ -7,13 +7,13 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import SCPButton from "./SuperComplexPublishButton";
+import reducer from './reducer';
 
 Quill.register('modules/imageResize', ImageResize);
 
 export default function NewRichTextEditor() {
   useEffect(() => {
-    console.log("Rendering newRichTE");
-    console.log("status: ", status);
+    console.log("Rendering newRichTEuseRed");
   })
 
   const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -23,56 +23,46 @@ export default function NewRichTextEditor() {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   
-  const [waiting, setWaiting] = useState<Boolean>(false);
   const [value, setValue] = useState('');
-  const [title, setTitle] = useState('');
-  const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState(0);
-  // let inputRef = useState<HTMLInputElement | null>(null);
+  const initialState = {
+      waiting: false,
+      title: "",
+      open:false,
+      status:0,
+  }
   let inputRef = useRef(null);
-
-  const handleClick = () => {
-    setOpen(true);
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleClose = (event?: React.SyntheticEvent | any, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    setOpen(false);
+    dispatch({type: "CLOSE_SNACKBAR",});
   };
 
+  const setvalueOfInput = (e:React.ChangeEvent<HTMLInputElement>) => dispatch({type:"UPDATE_INPUT_VALUE", payload: e.target.value})
   const whenSubmit = (e:any) =>{
-    e.preventDefault();
+    e.preventDefault();console.log("ll: ", value)
     const unprivilegedEditor = inputRef.current.makeUnprivilegedEditor(inputRef.current.getEditor());
     if (unprivilegedEditor.getLength() - 1 < 50) return "body length is too small"
-      //console.log("viola: ", unprivilegedEditor.getLength());//will also count "\n" char
-      //console.log(unprivilegedEditor.getText().length); //will also count "\n" char
-    
-    setWaiting(true);
+    dispatch({type:"LOADING"})
     axios.post("/post", { //You either do async/await or a Promise chain. Not both.
-      title, //in server, it will be referred to as "req.body.title"
+      title:state.title, //in server, it will be referred to as "req.body.title"
       content: value //in server, it will be referred to as "req.body.body"
     }, {
       headers: {'Content-Type': 'application/json'},
     }).then(function(res) {
-      // inputRef.current = null //even if setValue updates the state, inputRef value won't be rendered on the screen, so I had to use "title" state
-      setTitle("");
-      setValue(""); //clearing quill contents
-      setWaiting(false);
-      setStatus(Number(res.status));
-      handleClick();
+      dispatch({type:"SUCCESS", payload:Number(res.status)});
+      setValue("");
       console.log(res);
     }).catch(e => {
-      setWaiting(false);
-      setStatus(Number(e.response.status));
-      handleClick();
+      dispatch({type: "ERROR", payload:Number(e.response.status)})
     });
   }
 
   return (
     <>
-      {waiting ? (
+      {state.waiting ? (
         <LinearColor/>
       ) : (
         <div style={{
@@ -81,8 +71,8 @@ export default function NewRichTextEditor() {
         <form onSubmit={(e) => whenSubmit(e)}>
           <input type="text" placeholder="Title"
             minLength={7}
-            value={title} 
-            onChange={(e:any) => setTitle(e.target.value)}
+            value={state.title}
+            onChange={setvalueOfInput}
             style={{
               width: "100%",
               height:"32px",
@@ -115,12 +105,12 @@ export default function NewRichTextEditor() {
             <SCPButton/>
           </IconButton>
         </form>
-        <Snackbar open={open} autoHideDuration={2000} onClose={handleClose}>
-        {status === 200 ? (
+        <Snackbar open={state.open} autoHideDuration={2000} onClose={handleClose}>
+        {state.status === 200 ? (
             <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
                 Success!
             </Alert>
-        ) : status >= 500 ? (
+        ) : state.status >= 500 ? (
             <Alert onClose={handleClose} severity="warning" sx={{ width: '100%' }}>
                 Server error. Please try again later.
             </Alert>

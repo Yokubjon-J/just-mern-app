@@ -1,10 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Outlet, Link } from "react-router-dom";
 import AdminPanel from './components/AdminPanel';
 
 function App() {
+  useEffect(() => {
+    console.log("Rendering App.tsx");
+  })
   return (
     <BrowserRouter>
       <Routes>
