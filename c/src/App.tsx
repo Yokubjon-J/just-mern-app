@@ -1,8 +1,7 @@
 import React, {useEffect} from 'react';
-import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Outlet, Link } from "react-router-dom";
 import AdminPanel from './components/AdminPanel';
+import NewRichTextEditor from './components/NewRichTextEditorWithUseReducer';
 
 function App() {
   useEffect(() => {
@@ -11,9 +10,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<div className="App"><Outlet/></div>}> {/*w/o <Outlet/>, nesting wouldn't be possible*/}
-          <Route path="admin" element={<AdminPanel/>} />
-          <Route path="home" element={<p>Home</p>} />
+        <Route path="/" element={<p>Home</p>}/>
+        <Route path="admin" element={<AdminPanel/>}>
+          <Route path="new" element={<NewRichTextEditor/>}/>
+          <Route path="all" element={<p>All your posts:</p>}/>
         </Route>
       </Routes>
     </BrowserRouter>
