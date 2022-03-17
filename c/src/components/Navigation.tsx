@@ -24,6 +24,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {Link, useParams} from 'react-router-dom';
 
 const useStyles = makeStyles({
   list: {
@@ -94,6 +95,7 @@ const toggleDrawer =
   };
 
   const menuId = 'primary-search-account-menu';
+  console.log(";;;;:", window.location.href.indexOf("new"))
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -110,8 +112,14 @@ const toggleDrawer =
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        <Link 
+          to='/admin/new'
+          style={{
+            color: window.location.href.indexOf("new") > 0 ? "red" : "black",
+          }}
+          >New post</Link></MenuItem>
     </Menu>
   );
 

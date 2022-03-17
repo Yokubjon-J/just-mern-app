@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useRef, useEffect } from "react";
+import React, { useState, useReducer, useRef, useEffect, useMemo } from "react";
 import axios from 'axios';
 import LinearColor from './LinearColor';
 import ReactQuill, {Quill} from 'react-quill';
@@ -42,7 +42,7 @@ export default function NewRichTextEditor() {
 
   const setvalueOfInput = (e:React.ChangeEvent<HTMLInputElement>) => dispatch({type:"UPDATE_INPUT_VALUE", payload: e.target.value})
   const whenSubmit = (e:any) =>{
-    e.preventDefault();console.log("ll: ", value)
+    e.preventDefault();
     const unprivilegedEditor = inputRef.current.makeUnprivilegedEditor(inputRef.current.getEditor());
     if (unprivilegedEditor.getLength() - 1 < 50) return "body length is too small"
     dispatch({type:"LOADING"})
@@ -59,6 +59,57 @@ export default function NewRichTextEditor() {
       dispatch({type: "ERROR", payload:Number(e.response.status)})
     });
   }
+
+  const BlockEmbed = Quill.import('blots/block/embed');
+
+  const quillImageCallback = () => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+    input.onchange = async () => {
+      let formData = new FormData();
+      const file = input.files[0]; console.log("input.files[0]: ", input.files);
+      formData.append('image', file); console.log("file: ", file.name) 
+      let fileName = file.name;
+      axios.post("/imageupload", {
+        image: file,
+        filename: file.name,
+      }, {
+        headers: {'Content-Type': 'image/*'},
+      }).then(function(res) {
+        console.log("response after uploading image: ",res);
+      }).catch(e => {
+        console.log("error after uploading image: ", e);
+      });
+    }
+  };
+
+  const modules = useMemo(()=>( //w/o bug will arise, refer https://stackoverflow.com/questions/59825450/react-quill-custom-image-handler-module-causing-typing-issues-with-the-editor
+    {
+      toolbar: {
+          container: [
+              [{ header: '1' }, { header: '2' }, { header: [3, 4, 5, 6] }, { font: [] }],
+              [{ size: [] }],
+              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['link', 'image', 'video'],
+              ['clean'],
+              ['code-block']
+          ],
+          'handlers': {
+            image: quillImageCallback
+          }
+      },
+      clipboard: {
+        matchVisual: false,
+      },
+      imageResize: {
+        parchment: Quill.import('parchment'),
+        modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
+      }
+  }
+  ), []);
 
   return (
     <>
@@ -83,22 +134,7 @@ export default function NewRichTextEditor() {
           <ReactQuill theme="snow" value={value} onChange={setValue}
             placeholder="New blog"
             ref={inputRef}
-            modules={{
-              toolbar: {
-                  container: [
-                      [{ header: '1' }, { header: '2' }, { header: [3, 4, 5, 6] }, { font: [] }],
-                      [{ size: [] }],
-                      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                      [{ list: 'ordered' }, { list: 'bullet' }],
-                      ['link', 'image', 'video'],
-                      ['clean'],
-                      ['code-block']
-                  ],
-              },
-              imageResize: {
-                modules: [ 'Resize', 'DisplaySize', 'Toolbar' ]
-              }
-          }}
+            modules={modules}
           />
           {/* <input type="submit"></input> */}
           <IconButton type="submit">

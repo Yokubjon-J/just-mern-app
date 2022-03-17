@@ -1,5 +1,6 @@
 import express from "express";
 import { MongoClient } from "mongodb";
+import gridfsConnection from "../middleware/upload.js";
 
 const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogsDB?retryWrites=true&w=majority'
 
@@ -30,6 +31,17 @@ router.route("/post").post(
             return res.status(200).send("POST request fulfilled!");//this will be sent to client. To access this message on the client, you must write "res.data" in your react code.
           }
     }
+);
+
+router.route("/imageupload").post(
+  async (req, res) => {
+      try {
+          console.log("req is: ", req.body)
+          gridfsConnection(req, res)
+        } catch(error) {
+          console.log("error connecting to GridFS: ", error);
+        }
+  }
 );
 
 export default router;
