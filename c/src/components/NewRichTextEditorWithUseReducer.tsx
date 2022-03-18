@@ -66,17 +66,12 @@ export default function NewRichTextEditor() {
   const quillImageCallback = () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
+    input.setAttribute("accept", "image/png, image/jpg, image/jpeg");
     input.click();
     input.onchange = async () => {
-      let formData = new FormData();
-      const file = input.files[0]; console.log("input.files[0]: ", input.files);
-      formData.append("image", file.name, ); console.log("file: ", input.value);
-      let fileName = file.name;
       axios.post("/imageupload", {
-        image: formData,
-        filename: file.name,
-        // filepath: path.resolve("/"+file.name),
+        input,
+        imagename: input.files[0].name,
       }, {
         headers: {'Content-Type': 'application/json'},
       }).then(function(res) {
