@@ -10,7 +10,7 @@ async function gridfsConnection(req, res) {
         await client.connect();
         const database = client.db("blogsDB");
         const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });//console.log("req: ", req)
-        fs.createReadStream(req.body.image).
+        fs.createReadStream(req.body.filepath).
             pipe(bucket.
                 openUploadStream(req.body.filename,
                     {

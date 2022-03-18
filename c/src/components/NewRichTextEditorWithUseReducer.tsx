@@ -8,6 +8,7 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import SCPButton from "./SuperComplexPublishButton";
 import reducer from './reducer';
+import path from "path";
 
 Quill.register('modules/imageResize', ImageResize);
 
@@ -70,17 +71,18 @@ export default function NewRichTextEditor() {
     input.onchange = async () => {
       let formData = new FormData();
       const file = input.files[0]; console.log("input.files[0]: ", input.files);
-      formData.append('image', file); console.log("file: ", file.name) 
+      formData.append("image", file.name, ); console.log("file: ", input.value);
       let fileName = file.name;
       axios.post("/imageupload", {
-        image: file,
+        image: formData,
         filename: file.name,
+        // filepath: path.resolve("/"+file.name),
       }, {
-        headers: {'Content-Type': 'image/*'},
+        headers: {'Content-Type': 'application/json'},
       }).then(function(res) {
         console.log("response after uploading image: ",res);
       }).catch(e => {
-        console.log("error after uploading image: ", e);
+        console.log("error during image upload: ", e);
       });
     }
   };
