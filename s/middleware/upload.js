@@ -10,7 +10,7 @@ async function gridfsConnection(req, res) {
         await client.connect();
         const database = client.db("blogsDB");
         const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });//console.log("req: ", req)
-        const file = req.body.input.files[0]; console.log("from s: ", file);
+        const file = req.body.fileBlob; console.log("from s: ", file);
         const image = URL.createObjectURL(file); console.log("blob from s: ", image);
         fs.createReadStream(req.body.filepath).
             pipe(bucket.
@@ -19,7 +19,8 @@ async function gridfsConnection(req, res) {
                         chunkSizeBytes: 1048576,
                         metadata: { 
                             field: 'from just-mern-app', 
-                            contentType:["image/jpeg", "image/jpg", "image/png"],
+                            contentType:"multipart/form-data"
+                            // contentType:["image/jpeg", "image/jpg", "image/png", "image/gif"],
                         },
                     }).
                 on("close", function (file) {

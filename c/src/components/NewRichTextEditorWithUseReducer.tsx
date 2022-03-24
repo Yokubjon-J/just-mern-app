@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import SCPButton from "./SuperComplexPublishButton";
 import reducer from './reducer';
 import path from "path";
+// import FormData from 'form-data';
 
 Quill.register('modules/imageResize', ImageResize);
 
@@ -65,15 +66,27 @@ export default function NewRichTextEditor() {
 
   const quillImageCallback = () => {
     const input = document.createElement("input");
+    
     input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/png, image/jpg, image/jpeg");
+    input.setAttribute("accept", "image/png, image/jpg, image/jpeg, image/gif");
     input.click();
-    input.onchange = async () => {
-      axios.post("/imageupload", {
-        input,
-        imagename: input.files[0].name,
-      }, {
-        headers: {'Content-Type': 'application/json'},
+    input.onchange = () => {
+      const formdata = new FormData(); 
+      const file = input.files[0];//unused
+      const reader = new FileReader();//unused
+      reader.addEventListener("load", (e:any) => {
+        const img = document.createElement("img");//unused
+        img.setAttribute("src", e.target.result);//unused
+        const range = inputRef.current.getEditor().getSelection();
+        inputRef.current.getEditor().insertEmbed(range.index, 'image', "value", "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
+      });
+      reader.readAsDataURL(file);//unused
+      console.log("LLL: ", formdata);
+      axios.post("/imageupload", {formdata: formdata}, {
+        headers: {
+          // ...formdata.getHeaders()
+          "content-type":"multipart/form-data"
+        },
       }).then(function(res) {
         console.log("response after uploading image: ",res);
       }).catch(e => {

@@ -256,7 +256,7 @@ const toggleDrawer =
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-            Ozod Vatan - admin page
+            Weblog - admin page
           </Typography>
           <Search>
             <SearchIconWrapper>
