@@ -68,30 +68,33 @@ export default function NewRichTextEditor() {
     const input = document.createElement("input");
     
     input.setAttribute("type", "file");
+    input.setAttribute("name", "fileinput");
     input.setAttribute("accept", "image/png, image/jpg, image/jpeg, image/gif");
     input.click();
     input.onchange = () => {
-      const formdata = new FormData(); 
-      const file = input.files[0];//unused
-      const reader = new FileReader();//unused
-      reader.addEventListener("load", (e:any) => {
-        const img = document.createElement("img");//unused
-        img.setAttribute("src", e.target.result);//unused
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.addEventListener("load", async (e:any) => {
+        const base64String = JSON.stringify(reader.result)
+                .replace('data:', '')
+                .replace(/^.+,/, '');
         const range = inputRef.current.getEditor().getSelection();
-        inputRef.current.getEditor().insertEmbed(range.index, 'image', "value", "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
+        inputRef.current.getEditor().insertEmbed(range.index, 'image', reader.result, "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
+        axios.post("/imageupload", {
+            file: base64String,
+          }, {
+          // headers: {
+          //   // ...formdata.getHeaders()
+          //   "Content-Type":"multipart/form-data"
+          // },
+          }).then(function(res) {
+            console.log("response after uploading image: ",res);
+        }).catch(e => {
+          console.log("error during image upload: ", e);
+        });
       });
-      reader.readAsDataURL(file);//unused
-      console.log("LLL: ", formdata);
-      axios.post("/imageupload", {formdata: formdata}, {
-        headers: {
-          // ...formdata.getHeaders()
-          "content-type":"multipart/form-data"
-        },
-      }).then(function(res) {
-        console.log("response after uploading image: ",res);
-      }).catch(e => {
-        console.log("error during image upload: ", e);
-      });
+      reader.readAsDataURL(file);
+      
     }
   };
 
@@ -147,7 +150,7 @@ export default function NewRichTextEditor() {
             modules={modules}
           />
           {/* <input type="submit"></input> */}
-          <IconButton type="submit">
+          <IconButton type="submit" onSubmit={()=>{}}>
             <SCPButton/>
           </IconButton>
         </form>

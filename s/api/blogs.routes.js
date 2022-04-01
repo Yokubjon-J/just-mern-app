@@ -36,7 +36,6 @@ router.route("/post").post(
 router.route("/imageupload").post(
   async (req, res) => {
       try {
-          console.log("req is: ", req.body)
           gridfsConnection(req, res)
         } catch(error) {
           console.log("error connecting to GridFS: ", error);
