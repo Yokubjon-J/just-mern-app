@@ -29,7 +29,6 @@ MongoClient.connect(
     try {
         app.listen(port, () => {   //if DB connection is successful, start listening
             console.log(`🔋🎛🔋🎛🔋Connected to port ${port}🔋🎛🔋🎛🔋`);
-            console.log(`client: ${client}`);
         });
     } catch (error) {
         console.error(`Error occured: ${error.message}`);

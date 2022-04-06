@@ -82,6 +82,7 @@ export default function NewRichTextEditor() {
         inputRef.current.getEditor().insertEmbed(range.index, 'image', reader.result, "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
         axios.post("/imageupload", {
             file: base64String,
+            filename: input.files[0].name,
           }, {
           // headers: {
           //   // ...formdata.getHeaders()
