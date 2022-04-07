@@ -1,5 +1,5 @@
 import mongodb from "mongodb";
-import { MongoClient } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 import fs from "fs";
 import { Readable } from 'stream'
 
@@ -7,16 +7,15 @@ const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogs
 
 async function gridfsConnection(req, res) {
     try {
-        const client = new MongoClient(uri);
-        await client.connect();
+        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
         const database = client.db("blogsDB");
         const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });//console.log("req: ", req)
-        const buffer = new Buffer.from(req.body.file, 'base64');
+        const buffer = new Buffer.from(req.body.file, 'binary');
         const readable = new Readable();
         readable._read = () => {} //_read is required but you can noop it
-        readable.push(buffer);console.log("filename is: ", "mmmmmm");
-        
-        readable.
+        readable.push(buffer);console.log("filename is: ", buffer);
+        await client.connect(err => {
+            readable.
             pipe(bucket.
                 openUploadStream("mmmmmm",
                     {
@@ -32,15 +31,19 @@ async function gridfsConnection(req, res) {
                     // return file;
                 }).on("error", function (e) {
                     console.log("err isss: ", e);
-                    return res.end(err);
+                    res.end(err);
+                    client.close(); return;
                 })
             ).
             on("error", function (e) {
                 console.log("err isss: ", e);
-                return res.end(err);
+                res.end(err);
+                client.close(); return;
             });
-        await client.close();
-        return res.send("file uploaded by GridFS");
+        // await client.close();
+            res.send("file uploaded by GridFS");
+            client.close(); return;
+        });
     } catch (error) {
         console.log("Error in GridFS connection: ", error);
         return ;
