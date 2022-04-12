@@ -10,7 +10,7 @@ async function gridfsConnection(req, res) {
         const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
         const database = client.db("blogsDB");
         const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });//console.log("req: ", req)
-        const buffer = new Buffer.from(req.body.file, 'binary');
+        const buffer = new Buffer.from(req.body.file, 'base64');
         const readable = new Readable();
         readable._read = () => {} //_read is required but you can noop it
         readable.push(buffer);console.log("filename is: ", buffer);
