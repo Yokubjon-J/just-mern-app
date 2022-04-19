@@ -7,22 +7,14 @@ const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogs
 
 async function gridfsConnection(req, res) {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-    
-    const readable = new Readable({
-        read(){
-            const buffer = new Buffer.from(req.body.file, 'base64');
-            this.push(buffer);
-        }
-    });
     let bucket;
     try {
-        console.log("readable: ", readable, "0-0-0-0");
         await client.connect(err => {
             const database = client.db("blogsDB");
             bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
-            readable.
+            Readable.from(Buffer.from(req.body.file, 'base64')).
             pipe(bucket.
-                openUploadStream("someImage",
+                openUploadStream(req.body.filename,
                     {
                         chunkSizeBytes: 1048576,
                         metadata: { 
@@ -30,20 +22,13 @@ async function gridfsConnection(req, res) {
                             // contentType:"multipart/form-data"
                             // contentType:["image/jpeg", "image/jpg", "image/png", "image/gif"],
                         },
-                    }).
-                on("close", function (file) {
-                    console.log(file, "inserted to DB");
-                    // return file;
-                }).on("error", function (e) {
-                    console.log("err isss: ", e);
-                    res.end(err);
-                    client.close(); return;
-                })
+                    })
             ).
             on("error", function (e) {
                 console.log("err isss: ", e);
-                res.end(err);
-                client.close(); return;
+            }).
+            on("finish", function (file) {
+                console.log(file, "inserted to DB");
             });
         });
     } catch (error) {
