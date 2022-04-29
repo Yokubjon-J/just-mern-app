@@ -77,19 +77,22 @@ export default function NewRichTextEditor() {
       reader.addEventListener("load", async (e:any) => {
         const base64String = JSON.stringify(reader.result)
                 .replace('data:', '')
-                .replace(/^.+,/, '');
-        const range = inputRef.current.getEditor().getSelection();
-        inputRef.current.getEditor().insertEmbed(range.index, 'image', reader.result, "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
+                .replace(/^.+,/, '');//console.log("file izz: \n", file, "result: \n", reader.result, "base64String: /n", base64String);
+        // const range = inputRef.current.getEditor().getSelection();
+        // inputRef.current.getEditor().insertEmbed(range.index, 'image', `image/${input.files[0].name.replace(/ /g,'')}`, "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
         axios.post("/imageupload", {
             file: base64String,
-            filename: input.files[0].name,
+            filename: input.files[0].name.replace(/ /g,''),
+            fileMIMEtype: input.files[0].type,
           }, {
           // headers: {
           //   // ...formdata.getHeaders()
           //   "Content-Type":"multipart/form-data"
           // },
           }).then(function(res) {
-            console.log("response after uploading image: ",res);
+            console.log("response after uploading image: ",res)
+            const range = inputRef.current.getEditor().getSelection();
+            inputRef.current.getEditor().insertEmbed(range.index, 'image', `http://localhost:3001/api/v1/blogposts/image/?filename=${input.files[0].name.replace(/ /g,'')}&type=${input.files[0].type}`, "user");
         }).catch(e => {
           console.log("error during image upload: ", e);
         });

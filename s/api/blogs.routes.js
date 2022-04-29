@@ -1,20 +1,21 @@
 import express from "express";
-import { MongoClient } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 import gridfsConnection from "../middleware/upload.js";
+import { gridfsImageDownload } from "../middleware/upload.js";
 
 const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogsDB?retryWrites=true&w=majority'
 
 const router = express.Router();
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 router.route("/").get(
-    (req, res) => {
+    (req, res, next) => {
         return res.status(200).send("<h1>Welcome to Backyard!</h1>");
     }
 );
 
 router.route("/post").post(
-    async (req, res) => {
+    async (req, res, next) => {
         try {
             await client.connect();
             const database = client.db("blogsDB");
@@ -34,11 +35,21 @@ router.route("/post").post(
 );
 
 router.route("/imageupload").post(
-  async (req, res) => {
-      try {
-          gridfsConnection(req, res)
+  async (req, res, next) => {
+      try {console.log(1, client != undefined ? "defined" : "not def!");
+          await gridfsConnection(req, res, next);console.log(11)
         } catch(error) {
           console.log("error connecting to GridFS: ", error);
+        }
+  }
+);
+
+router.route("/image").get(
+  async (req, res, next) => {
+      try {
+          await gridfsImageDownload(req, res, next);
+        } catch(error) {
+          console.log("***error while retrieving image from GridFS ***\n", error);
         }
   }
 );

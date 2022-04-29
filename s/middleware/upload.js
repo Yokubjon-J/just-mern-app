@@ -5,13 +5,13 @@ import { Readable } from 'stream'
 
 const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogsDB?retryWrites=true&w=majority'
 
-async function gridfsConnection(req, res) {
+async function gridfsConnection(req, res, next) {
+    //if client declaration below is moved outside of the func, the server will crash. i don't know the reason
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-    let bucket;
     try {
-        await client.connect(err => {
+        await client.connect(err => {console.log(2, client != undefined ? "defined" : "not def!");
             const database = client.db("blogsDB");
-            bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
+            const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
             Readable.from(Buffer.from(req.body.file, 'base64')).
             pipe(bucket.
                 openUploadStream(req.body.filename,
@@ -28,14 +28,34 @@ async function gridfsConnection(req, res) {
                 console.log("err isss: ", e);
             }).
             on("finish", function (file) {
-                console.log(file, "inserted to DB");
+                console.log(file, "\n inserted to DB");
             });
         });
     } catch (error) {
         console.log("Error in GridFS connection: ", error);
-        return ;
     } finally {
         res.send("file uploaded by GridFS");
+        await client.close();
+    }
+}
+
+export const gridfsImageDownload = async (req, res) => {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+    try {
+        await client.connect(e => {
+            const database = client.db("blogsDB");console.log(5555, req.query);
+            const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
+            const readStream = bucket.openDownloadStreamByName(req.query.filename);
+            res.contentType(req.query.type);
+            readStream.pipe(res);
+            // const readStream = bucket.openDownloadStreamByName({
+            //     filename: req.body.filename
+            // });
+            // readStream.pipe(res);
+        });
+    } catch (error) {
+        console.log("* error while retrieving image: *\n", e);
+    } finally {
         await client.close();
     }
 }

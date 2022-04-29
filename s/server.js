@@ -17,6 +17,7 @@ app.use("*", (req, res) => res.status(404).json({error:"🚨🚦🚥🚧🎛⬇�
 MongoClient.connect(
     connectionString,
     {
+        // poolSize: 50,
         useNewUrlParser: true,
         wtimeoutMS: 4000,
     })
