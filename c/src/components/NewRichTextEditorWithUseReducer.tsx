@@ -9,7 +9,6 @@ import IconButton from '@mui/material/IconButton';
 import SCPButton from "./SuperComplexPublishButton";
 import reducer from './reducer';
 import path from "path";
-// import FormData from 'form-data';
 
 Quill.register('modules/imageResize', ImageResize);
 
@@ -71,15 +70,14 @@ export default function NewRichTextEditor() {
     input.setAttribute("name", "fileinput");
     input.setAttribute("accept", "image/png, image/jpg, image/jpeg, image/gif");
     input.click();
-    input.onchange = () => {
+    input.onchange = async () => {
       const file = input.files[0];
       const reader = new FileReader();
+      let timeoutId: null | ReturnType<typeof setTimeout> = null
       reader.addEventListener("load", async (e:any) => {
         const base64String = JSON.stringify(reader.result)
                 .replace('data:', '')
-                .replace(/^.+,/, '');//console.log("file izz: \n", file, "result: \n", reader.result, "base64String: /n", base64String);
-        // const range = inputRef.current.getEditor().getSelection();
-        // inputRef.current.getEditor().insertEmbed(range.index, 'image', `image/${input.files[0].name.replace(/ /g,'')}`, "user");//taken from https://github.com/zenoamaro/react-quill/issues/169#issuecomment-308838684
+                .replace(/^.+,/, '');
         axios.post("/imageupload", {
             file: base64String,
             filename: input.files[0].name.replace(/ /g,''),
@@ -90,7 +88,7 @@ export default function NewRichTextEditor() {
           //   "Content-Type":"multipart/form-data"
           // },
           }).then(function(res) {
-            console.log("response after uploading image: ",res)
+            console.log("response isz: ", res);
             const range = inputRef.current.getEditor().getSelection();
             inputRef.current.getEditor().insertEmbed(range.index, 'image', `http://localhost:3001/api/v1/blogposts/image/?filename=${input.files[0].name.replace(/ /g,'')}&type=${input.files[0].type}`, "user");
         }).catch(e => {
@@ -98,7 +96,6 @@ export default function NewRichTextEditor() {
         });
       });
       reader.readAsDataURL(file);
-      
     }
   };
 

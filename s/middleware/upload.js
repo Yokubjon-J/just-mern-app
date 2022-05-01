@@ -9,7 +9,7 @@ async function gridfsConnection(req, res, next) {
     //if client declaration below is moved outside of the func, the server will crash. i don't know the reason
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
     try {
-        await client.connect(err => {console.log(2, client != undefined ? "defined" : "not def!");
+        await client.connect(err => {
             const database = client.db("blogsDB");
             const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
             Readable.from(Buffer.from(req.body.file, 'base64')).
@@ -29,14 +29,13 @@ async function gridfsConnection(req, res, next) {
             }).
             on("finish", function (file) {
                 console.log(file, "\n inserted to DB");
+                res.send("file uploaded by GridFS");
+                client.close();
             });
         });
     } catch (error) {
         console.log("Error in GridFS connection: ", error);
-    } finally {
-        res.send("file uploaded by GridFS");
-        await client.close();
-    }
+    }//finally{res.send("file uploaded by GridFS")} won't work
 }
 
 export const gridfsImageDownload = async (req, res) => {

@@ -34,22 +34,22 @@ router.route("/post").post(
     }
 );
 
-router.route("/imageupload").post(
-  async (req, res, next) => {
-      try {console.log(1, client != undefined ? "defined" : "not def!");
-          await gridfsConnection(req, res, next);console.log(11)
-        } catch(error) {
-          console.log("error connecting to GridFS: ", error);
-        }
-  }
-);
-
-router.route("/image").get(
+router.route("/image").get( //were it after "/imageupload" route, frontend wouldn't load the image
   async (req, res, next) => {
       try {
           await gridfsImageDownload(req, res, next);
         } catch(error) {
-          console.log("***error while retrieving image from GridFS ***\n", error);
+          console.log("error retrieving image from GridFS\n", error);
+        }
+  }
+);
+
+router.route("/imageupload").post(
+  async (req, res, next) => {
+      try {
+          await gridfsConnection(req, res, next);
+        } catch(error) {
+          console.log("error connecting to GridFS\n", error);
         }
   }
 );
