@@ -34,7 +34,7 @@ router.route("/post").post(
     }
 );
 
-router.route("/image").get( //were it after "/imageupload" route, frontend wouldn't load the image
+router.route("/image").get(
   async (req, res, next) => {
       try {
           await gridfsImageDownload(req, res, next);

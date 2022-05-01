@@ -8,7 +8,6 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import SCPButton from "./SuperComplexPublishButton";
 import reducer from './reducer';
-import path from "path";
 
 Quill.register('modules/imageResize', ImageResize);
 
@@ -73,7 +72,6 @@ export default function NewRichTextEditor() {
     input.onchange = async () => {
       const file = input.files[0];
       const reader = new FileReader();
-      let timeoutId: null | ReturnType<typeof setTimeout> = null
       reader.addEventListener("load", async (e:any) => {
         const base64String = JSON.stringify(reader.result)
                 .replace('data:', '')
