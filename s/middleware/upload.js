@@ -42,7 +42,7 @@ export const gridfsImageDownload = async (req, res) => {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
     try {
         await client.connect(e => {
-            const database = client.db("blogsDB");console.log(5555, req.query);
+            const database = client.db("blogsDB");
             const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
             const readStream = bucket.openDownloadStreamByName(req.query.filename);
             res.contentType(req.query.type);
