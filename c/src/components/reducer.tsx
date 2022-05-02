@@ -3,6 +3,7 @@ interface State {
     title: string,
     open:boolean,
     status:number,
+    firstImg: string,
 }
 
 interface SuccessfullyCreated {
@@ -29,11 +30,17 @@ interface UpdateInputValue {
     payload:string,
 }
 
+interface FirstImageSet {
+    type:"FIRST_IMAGE_SET",
+    payload:string,
+}
+
 type Action = SuccessfullyCreated 
     | Loading
     | CloseSnackbar
     | Error
     | UpdateInputValue
+    | FirstImageSet
 
 export default function reducer(state: State, action: Action):State {
     switch (action.type) {
@@ -66,6 +73,11 @@ export default function reducer(state: State, action: Action):State {
             return {
                 ...state,
                 title: action.payload,
+            }
+        case "FIRST_IMAGE_SET":
+            return {
+                ...state,
+                firstImg: action.payload
             }
         default:
             return state;

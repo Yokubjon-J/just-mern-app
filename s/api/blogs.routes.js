@@ -25,6 +25,7 @@ router.route("/post").post(
             const result = await haiku.insertOne({
               title: req.body.title,
               content: req.body.content,
+              firstImg: req.body.firstImg,
             });
             console.log(`A document was inserted, ${req.body}`);
           } finally {

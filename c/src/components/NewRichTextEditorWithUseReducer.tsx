@@ -29,6 +29,7 @@ export default function NewRichTextEditor() {
       title: "",
       open:false,
       status:0,
+      firstImg: "undefined",
   }
   let inputRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -41,14 +42,31 @@ export default function NewRichTextEditor() {
   };
 
   const setvalueOfInput = (e:React.ChangeEvent<HTMLInputElement>) => dispatch({type:"UPDATE_INPUT_VALUE", payload: e.target.value})
+  
+  function getRandomNumbers() {
+    var array = new Uint32Array(10);
+    window.crypto.getRandomValues(array);
+   
+    for (var i = 0; i < array.length; i++) {
+      console.log(array[i] + " ");
+    }
+  }
+
+  function uid() {
+    let a = new Uint32Array(3);
+    window.crypto.getRandomValues(a);
+    return (performance.now().toString(36)+Array.from(a).map(A => A.toString(36)).join("")).replace(/\./g,"");
+  };
+
   const whenSubmit = (e:any) =>{
     e.preventDefault();
     const unprivilegedEditor = inputRef.current.makeUnprivilegedEditor(inputRef.current.getEditor());
     if (unprivilegedEditor.getLength() - 1 < 50) return "body length is too small"
     dispatch({type:"LOADING"})
     axios.post("/post", { //You either do async/await or a Promise chain. Not both.
-      title:state.title, //in server, it will be referred to as "req.body.title"
-      content: value //in server, it will be referred to as "req.body.body"
+      title:state.title,
+      content: value,
+      firstImg: state.firstImg,
     }, {
       headers: {'Content-Type': 'application/json'},
     }).then(function(res) {
@@ -72,13 +90,15 @@ export default function NewRichTextEditor() {
     input.onchange = async () => {
       const file = input.files[0];
       const reader = new FileReader();
+      let filename : string;
       reader.addEventListener("load", async (e:any) => {
         const base64String = JSON.stringify(reader.result)
                 .replace('data:', '')
                 .replace(/^.+,/, '');
+        filename = `${input.files[0].name.replace(/ /g,'')}-${uid()}`;
         axios.post("/imageupload", {
             file: base64String,
-            filename: input.files[0].name.replace(/ /g,''),
+            filename,
             fileMIMEtype: input.files[0].type,
           }, {
           // headers: {
@@ -86,11 +106,13 @@ export default function NewRichTextEditor() {
           //   "Content-Type":"multipart/form-data"
           // },
           }).then(function(res) {
-            console.log("response isz: ", res);
             const range = inputRef.current.getEditor().getSelection();
-            inputRef.current.getEditor().insertEmbed(range.index, 'image', `http://localhost:3001/api/v1/blogposts/image/?filename=${input.files[0].name.replace(/ /g,'')}&type=${input.files[0].type}`, "user");
+            inputRef.current.getEditor().insertEmbed(range.index, 'image', `http://localhost:3001/api/v1/blogposts/image/?filename=${filename}&type=${input.files[0].type}`, "user");
         }).catch(e => {
-          console.log("error during image upload: ", e);
+          console.log("image upload error: ", e);
+        }).finally(()=>{
+          //console.log(state.firstImg === "undefined", state.firstImg)//curious case,seems that updated value of firstImg doesn't consolelog
+          dispatch({type: "FIRST_IMAGE_SET", payload:`http://localhost:3001/api/v1/blogposts/image/?filename=${filename}&type=${input.files[0].type}`});
         });
       });
       reader.readAsDataURL(file);
