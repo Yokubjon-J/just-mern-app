@@ -6,7 +6,7 @@ import { Readable } from 'stream'
 const uri = 'mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogsDB?retryWrites=true&w=majority'
 
 async function gridfsConnection(req, res, next) {
-    //if client declaration below is moved outside of the func, the server will crash. i don't know the reason
+    //if client declaration below is outside of the func, the server will crash. don't know the reason
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
     try {
         await client.connect(err => {
@@ -47,10 +47,6 @@ export const gridfsImageDownload = async (req, res) => {
             const readStream = bucket.openDownloadStreamByName(req.query.filename);
             res.contentType(req.query.type);
             readStream.pipe(res);
-            // const readStream = bucket.openDownloadStreamByName({
-            //     filename: req.body.filename
-            // });
-            // readStream.pipe(res);
         });
     } catch (error) {
         console.log("* error while retrieving image: *\n", e);
