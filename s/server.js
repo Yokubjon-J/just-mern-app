@@ -1,11 +1,13 @@
 import express from "express";
-import blogs from './api/blogs.routes.js';
+import blogs from './api/server.routes.js';
+// import blogs from './api/server2.routes.js';
+import PostsDAO from "./data_access_object/postsDAO.js";
 import cors from "cors";
 import mongodb from 'mongodb';
 const app = express();
 const port = "3001";
 const connectionString = "mongodb+srv://justadmin:justadminn@cluster0.pvwjg.mongodb.net/blogsDB?retryWrites=true&w=majority";
-const MongoClient = mongodb.MongoClient
+const MongoClient = mongodb.MongoClient;
 
 // Body parsing Middleware
 app.use(cors());
@@ -26,8 +28,9 @@ MongoClient.connect(
     console.error(error.stack);
     process.exit(1);
 })
-.then((client)=>{
+.then(async (client)=>{
     try {
+        await PostsDAO.injectDB(client);
         app.listen(port, () => {   //if DB connection is successful, start listening
             console.log(`🔋🎛🔋🎛🔋Connected to port ${port}🔋🎛🔋🎛🔋`);
         });

@@ -10,8 +10,8 @@ async function gridfsConnection(req, res, next) {
     const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
     try {
         await client.connect(err => {
-            const database = client.db("blogsDB");
-            const bucket = new mongodb.GridFSBucket(database, { bucketName: 'myImageBucket' });
+            const database = client.db("blogsDB"); //console.log("cdb: \n", client.db());
+            const bucket = new mongodb.GridFSBucket(client.db(), { bucketName: 'myImageBucket' });
             Readable.from(Buffer.from(req.body.file, 'base64')).
             pipe(bucket.
                 openUploadStream(req.body.filename,
