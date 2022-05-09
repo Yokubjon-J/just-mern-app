@@ -15,7 +15,7 @@ const FrontPage = () => {
                 });
                 console.log("all posts in c:\n", posts);
             });
-    }, [posts]);
+    }, []);//deleting [] will cause infinite loop
     return (
         posts === null ? (
             <Box sx={{ display: 'flex' }}>

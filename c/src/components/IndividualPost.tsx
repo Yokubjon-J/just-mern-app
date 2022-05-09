@@ -10,10 +10,9 @@ interface PostProps {
   postImage: string;
   title: string;
   content: HTMLElement,
-  key:number,
 }
 
-export default function IndividualPost({postImage, title, content, key}:PostProps) {
+export default function IndividualPost({postImage, title, content}:PostProps) {
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
