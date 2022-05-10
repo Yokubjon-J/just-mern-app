@@ -74,7 +74,6 @@ export default class PostsDAO {
     static retrievePosts = async (req, res) => {
         try {
             const allPosts = await posts.find({}).toArray();
-            console.log("all posts:\n", allPosts);
             await res.send(allPosts);
         } catch (error) {
             console.log(error);
