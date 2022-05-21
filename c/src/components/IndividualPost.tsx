@@ -26,7 +26,7 @@ export default function IndividualPost({postImage, title, content}:PostProps) {
           </body>
         </html>`, "text/html");
     const divContent = parsedDocument.getElementsByClassName("dummy")[0].innerHTML;
-    console.log("l: ", typeof parsedDocument.getElementsByClassName("dummy")[0]);
+    console.log("l: ", parsedDocument.getElementsByClassName("dummy")[0]);
     return divContent;
   };
 
@@ -45,9 +45,9 @@ export default function IndividualPost({postImage, title, content}:PostProps) {
         {/* <Typography variant="body2" color="text.secondary">
           {content}
         </Typography> */}
-        <div>
-          {textToHTML(content)}
-        </div>
+        {/* <div>
+          <div dangerouslySetInnerHTML={{ __html: textToHTML(content) }} />
+        </div> */}
       </CardContent>
       <CardActions>
         <Button size="small">Share</Button>

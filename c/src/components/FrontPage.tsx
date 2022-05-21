@@ -22,7 +22,12 @@ const FrontPage = () => {
                 <CircularProgress />
             </Box>
         ) : (
-            posts.map((post:any, i:number) => <IndividualPost key={post._id} postImage={post.firstImg} title={post.title} content={post.content}/>)
+            <Box sx={{ 
+                    display: 'flex',
+                    flexWrap:"wrap"
+                }}>
+                {posts.map((post:any, i:number) => <IndividualPost key={post._id} postImage={post.firstImg} title={post.title} content={post.content}/>)}
+            </Box>
         )
     )
 }
