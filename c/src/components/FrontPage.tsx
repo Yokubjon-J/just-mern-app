@@ -3,6 +3,8 @@ import axios from "axios";
 import IndividualPost from './IndividualPost';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
 
 const FrontPage = () => {
     const [posts, setPosts] = useState(null);
@@ -22,11 +24,16 @@ const FrontPage = () => {
                 <CircularProgress />
             </Box>
         ) : (
-            <Box sx={{ 
-                    display: 'flex',
-                    flexWrap:"wrap"
-                }}>
-                {posts.map((post:any, i:number) => <IndividualPost key={post._id} postImage={post.firstImg} title={post.title} content={post.content}/>)}
+            <Box>
+                <></>
+                <Box sx={{ 
+                        display: 'flex',
+                        flexWrap:"wrap",
+                        padding: "20px",
+                        gap:"20px",
+                    }}>
+                    {posts.map((post:any, i:number) => <IndividualPost key={post._id} postImage={post.firstImg} title={post.title} content={post.content}/>)}
+                </Box>
             </Box>
         )
     )

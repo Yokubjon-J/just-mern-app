@@ -31,12 +31,17 @@ export default function IndividualPost({postImage, title, content}:PostProps) {
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ 
+      maxWidth: 400
+    }}>
       <CardMedia
         component="img"
         height="140"
         image={postImage}
         alt="post image"
+        sx={{
+          minWidth: 300,
+        }}
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
