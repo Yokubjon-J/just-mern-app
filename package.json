@@ -1,0 +1,30 @@
+{
+  "name": "mern-blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "template.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yokubjon-J/just-mern-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yokubjon-J/just-mern-app/issues"
+  },
+  "homepage": "https://github.com/Yokubjon-J/just-mern-app#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "express": "^4.18.1",
+    "mongodb": "^4.6.0",
+    "quill-image-resize-module-ts": "^3.0.3",
+    "react": "^17.0.2",
+    "react-dom": "^18.1.0",
+    "react-router-dom": "^6.3.0",
+    "typescript": "^4.7.2"
+  }
+}
